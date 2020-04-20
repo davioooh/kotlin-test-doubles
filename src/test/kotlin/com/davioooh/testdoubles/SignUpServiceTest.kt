@@ -29,6 +29,21 @@ internal class SignUpServiceTest {
     }
 
     @Test
+    fun `should throw an exception when email is already used`() {
+        val repositoryMock = EmailAlreadyUsedUserRepositoryMock(
+                expectedNumberOfCalls = 1,
+                expectedEmail = "address@mail.com"
+        )
+        val signUpService = SignUpService(repositoryMock)
+
+        assertThrows<IllegalArgumentException> {
+            signUpService.signUp(SignUpRequest("user", "address@mail.com", "pwd"))
+        }
+
+        repositoryMock.verify()
+    }
+
+    @Test
     fun `should throw an exception when username is already used`() {
         val signUpService = SignUpService(FakeUserRepository(User("user", "", "")))
 
