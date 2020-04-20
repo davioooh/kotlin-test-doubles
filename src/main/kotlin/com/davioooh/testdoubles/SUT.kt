@@ -3,6 +3,9 @@ package com.davioooh.testdoubles
 class SignUpService(private val userRepository: UserRepository) {
     fun signUp(signUpRequest: SignUpRequest): UserDTO {
         if (signUpRequest.isValid) {
+            if (userRepository.existsUserWithEmail(signUpRequest.email))
+                throw IllegalArgumentException("Email ${signUpRequest.email} already used")
+
             val user = userRepository.saveUser(signUpRequest.mapToUser())
             return user.mapToUserDTO()
         } else
@@ -19,6 +22,7 @@ open class SignUpRequest(val userName: String, val email: String, val password: 
 
 interface UserRepository {
     fun saveUser(user: User): User
+    fun existsUserWithEmail(email: String): Boolean
 }
 
 data class User(val userName: String, val email: String, val password: String)
